@@ -7,7 +7,11 @@
 #include <ntstatus.h>
 #include "ia32.hpp"
 
+#define MAX_HOOKS 4 //最多几个hook
+
 #define VMEXIT_KEY 0xDEADBEEFDEADBEEF
+#define VMEXIT_ADDPAGE 0xEEEEEEEABCEEEEEE
+#define VMEXIT_DELETEPAGE 0xEEEEEEEABCEEEEEF
 #define PAGE_4KB 0x1000
 #define PAGE_2MB PAGE_4KB * 512
 #define PAGE_1GB PAGE_2MB * 512
@@ -30,7 +34,13 @@ enum class vmexit_command_t
 	write_guest_phys,
 	copy_guest_virt,
 	get_dirbase,
-	translate
+	translate,
+	add_shadow_page,
+	add_shadow_page_phys,
+	delete_shadow_page,
+	unhide_shadow_page,
+	disable_page_protection,
+	DiablePCID
 };
 
 enum class vmxroot_error_t
@@ -72,6 +82,36 @@ typedef union _command_t
 		guest_virt_t virt_src;
 		guest_phys_t phys_addr;
 	} translate_virt;
+
+	struct _addShadowPage
+	{
+		guest_virt_t uVirtualAddrToHook;
+		guest_virt_t uPageRead;
+		guest_virt_t uPageExecute;
+	}addShadowPage;
+
+	struct _addShadowPagePhys
+	{
+		guest_virt_t uVirtualAddrToHook;
+		guest_phys_t uPageRead;
+		guest_phys_t uPageExecute;
+
+	}addShadowPagePhys;
+
+	struct _deleteShaowPage
+	{
+		guest_virt_t uVirtualAddrToHook;
+	}deleteShaowPage;
+
+	struct _unHideShaowPage
+	{
+		guest_virt_t uVirtualAddrToHook;
+	}unHideShaowPage;
+
+	struct _disablePageProtection
+	{
+		guest_phys_t phys_addr;
+	}disablePageProtection;
 
 	guest_phys_t dirbase;
 
@@ -121,3 +161,44 @@ typedef struct _voyager_t
 #pragma pack(pop)
 
 __declspec(dllexport) inline voyager_t voyager_context;
+
+union EptViolationQualification {
+	ULONG64 all;
+	struct {
+		ULONG64 read_access : 1;                   //!< [0]
+		ULONG64 write_access : 1;                  //!< [1]
+		ULONG64 execute_access : 1;                //!< [2]
+		ULONG64 ept_readable : 1;                  //!< [3]
+		ULONG64 ept_writeable : 1;                 //!< [4]
+		ULONG64 ept_executable : 1;                //!< [5]
+		ULONG64 ept_executable_for_user_mode : 1;  //!< [6]
+		ULONG64 valid_guest_linear_address : 1;    //!< [7]
+		ULONG64 caused_by_translation : 1;         //!< [8]
+		ULONG64 user_mode_linear_address : 1;      //!< [9]
+		ULONG64 readable_writable_page : 1;        //!< [10]
+		ULONG64 execute_disable_page : 1;          //!< [11]
+		ULONG64 nmi_unblocking : 1;                //!< [12]
+	} fields;
+};
+
+enum class InvEptType : ULONG_PTR {
+	kSingleContextInvalidation = 1,
+	kGlobalInvalidation = 2,
+};
+
+union EptPointer {
+	ULONG64 all;
+	struct {
+		ULONG64 memory_type : 3;                      //!< [0:2]
+		ULONG64 page_walk_length : 3;                 //!< [3:5]
+		ULONG64 enable_accessed_and_dirty_flags : 1;  //!< [6]
+		ULONG64 reserved1 : 5;                        //!< [7:11]
+		ULONG64 pml4_address : 36;                    //!< [12:48-1]
+		ULONG64 reserved2 : 16;                       //!< [48:63]
+	} fields;
+};
+
+struct InvEptDescriptor {
+	ULONG64 ept_pointer;
+	ULONG64 reserved1;
+};
