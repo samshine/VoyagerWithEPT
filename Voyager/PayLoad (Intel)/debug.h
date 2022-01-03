@@ -4,6 +4,7 @@
 #include "types.h"
 
 #define PORT_NUM 0x2F8
+
 namespace dbg
 {
 	constexpr char alphabet[] = "0123456789ABCDEF";
