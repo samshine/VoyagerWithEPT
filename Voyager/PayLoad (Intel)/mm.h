@@ -1,6 +1,8 @@
 #pragma once
-#include "types.h"
 #include "debug.h"
+#include "ept.h"
+
+#define MAX_CPU_COUNT 256 //最多多少个核
 
 #define SELF_REF_PML4_IDX 510
 #define MAPPING_PML4_IDX 100
@@ -14,7 +16,8 @@
 #pragma section(".pdpt", read, write)
 #pragma section(".pd", read, write)
 #pragma section(".pt", read, write)
-
+#pragma section(".shadowhook",read,write)
+#pragma section(".shadowpte",read,write)
 namespace mm
 {
     enum class map_type_t
@@ -145,6 +148,10 @@ namespace mm
     __declspec(allocate(".pdpt")) inline pdpte pdpt[512];
     __declspec(allocate(".pd")) inline pde pd[512];
     __declspec(allocate(".pt")) inline pte pt[512];
+    __declspec(allocate(".shadowhook")) inline SharedShadowHookData ShadowHookData;
+    __declspec(allocate(".shadowpte")) inline  ShadowPte shadow[MAX_HOOKS];
+    //__declspec(allocate(".shadMrk")) inline bool shadowMark[256][4];
+    
 
     inline const ppml4e hyperv_pml4{ reinterpret_cast<ppml4e>(SELF_REF_PML4) };
 
