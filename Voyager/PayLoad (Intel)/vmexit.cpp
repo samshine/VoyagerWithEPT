@@ -11,7 +11,7 @@ namespace vmexit
 		// get the pfn and bitshift it...
 		guest_dirbase = cr3{ guest_dirbase }.pml4_pfn << 12;
 
-		const auto command_page = 
+		const auto command_page =
 			mm::map_guest_virt(guest_dirbase, command_ptr);
 
 		return *reinterpret_cast<command_t*>(command_page);
@@ -28,7 +28,7 @@ namespace vmexit
 
 		const auto command_page =
 			mm::map_guest_virt(guest_dirbase, command_ptr);
-
+		//memcpy((void*)command_page, &command_data, sizeof(command_t));
 		*reinterpret_cast<command_t*>(command_page) = command_data;
 	}
 }

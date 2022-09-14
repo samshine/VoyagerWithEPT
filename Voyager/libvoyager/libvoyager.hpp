@@ -27,7 +27,13 @@ namespace voyager
 		write_guest_phys,
 		copy_guest_virt,
 		get_dirbase,
-		translate
+		translate,
+		add_shadow_page,
+		add_shadow_page_phys,
+		delete_shadow_page,
+		unhide_shadow_page,
+		disable_page_protection,
+		DiablePCID
 	};
 
 	enum class vmxroot_error_t
@@ -70,6 +76,35 @@ namespace voyager
 			guest_phys_t phys_addr;
 		} translate_virt;
 
+		struct _addShadowPage
+		{
+			guest_virt_t uVirtualAddrToHook;
+			guest_virt_t uPageRead;
+			guest_virt_t uPageExecute;
+		}addShadowPage;
+
+		struct _addShadowPagePhys
+		{
+			guest_virt_t uVirtualAddrToHook;
+			guest_phys_t uPageRead;
+			guest_phys_t uPageExecute;
+		}addShadowPagePhys;
+
+		struct _deleteShaowPage
+		{
+			guest_virt_t uVirtualAddrToHook;
+		}deleteShaowPage;
+
+		struct _unHideShaowPage
+		{
+			guest_virt_t uVirtualAddrToHook;
+		}unHideShaowPage;
+
+		struct _disablePageProtection
+		{
+			guest_phys_t phys_addr;
+		}disablePageProtection;
+
 		guest_phys_t dirbase;
 
 	} command_t, * pcommand_t;
@@ -79,6 +114,15 @@ namespace voyager
 	/// </summary>
 	extern "C" auto hypercall(u64 key, vmexit_command_t, pcommand_t command)->vmxroot_error_t;
 
+	auto addShadowPage(guest_virt_t uAddr, guest_virt_t uPageRead, guest_virt_t uPageExecute)->vmxroot_error_t;
+
+	auto addShadowPagePhys(guest_virt_t uAddr, guest_phys_t uPageRead, guest_phys_t uPageExecute)->vmxroot_error_t;
+
+	auto deleteShadowPage(guest_virt_t uAddr)->vmxroot_error_t;
+
+	auto unHideShadowPage(guest_virt_t uAddr)->vmxroot_error_t;
+
+	auto disablePageProtection(guest_phys_t phys_addr)->vmxroot_error_t;
 	/// <summary>
 	/// gets the current cores CR3 value (current address space pml4)...
 	/// </summary>

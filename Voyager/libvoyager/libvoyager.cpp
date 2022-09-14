@@ -27,6 +27,7 @@ auto voyager::init() -> vmxroot_error_t
             auto result = hypercall(VMEXIT_KEY, vmexit_command_t::init_page_tables, nullptr);
             if (result != vmxroot_error_t::error_success)
                 return result;
+            //hypercall(VMEXIT_KEY, vmexit_command_t::DiablePCID, nullptr);
         }
     }
 
@@ -34,9 +35,44 @@ auto voyager::init() -> vmxroot_error_t
     return vmxroot_error_t::error_success;
 }
 
+auto voyager::addShadowPage(guest_virt_t uAddr, guest_virt_t uPageRead, guest_virt_t uPageExecute)->vmxroot_error_t
+{
+    command_t command = {0};
+    command.addShadowPage = { uAddr,uPageRead,uPageExecute };
+    return hypercall(VMEXIT_KEY,vmexit_command_t::add_shadow_page, &command);
+}
+
+auto voyager::addShadowPagePhys(guest_virt_t uAddr, guest_phys_t uPageRead, guest_phys_t uPageExecute)->vmxroot_error_t
+{
+    command_t command = { 0 };
+    command.addShadowPagePhys = { uAddr,uPageRead,uPageExecute };
+    return hypercall(VMEXIT_KEY, vmexit_command_t::add_shadow_page_phys, &command);
+}
+
+auto voyager::deleteShadowPage(guest_virt_t uAddr)->vmxroot_error_t
+{
+    command_t command = { 0 };
+    command.deleteShaowPage = { uAddr };
+    return hypercall(VMEXIT_KEY, vmexit_command_t::delete_shadow_page, &command);
+}
+
+auto voyager::unHideShadowPage(guest_virt_t uAddr)->vmxroot_error_t
+{
+    command_t command = { 0 };
+    command.unHideShaowPage = { uAddr };
+    return hypercall(VMEXIT_KEY, vmexit_command_t::unhide_shadow_page, &command);
+}
+
+auto voyager::disablePageProtection(guest_phys_t phys_addr)->vmxroot_error_t
+{
+    command_t command = { 0 };
+    command.disablePageProtection.phys_addr = phys_addr;
+    return hypercall(VMEXIT_KEY, vmexit_command_t::disable_page_protection, &command);
+}
+
 auto voyager::current_dirbase()->guest_phys_t
 {
-    command_t command;
+    command_t command = {0};
     auto result = hypercall(VMEXIT_KEY, vmexit_command_t::get_dirbase, &command);
 
     if (result != vmxroot_error_t::error_success)
@@ -47,7 +83,7 @@ auto voyager::current_dirbase()->guest_phys_t
 
 auto voyager::translate(guest_virt_t virt_addr) -> guest_phys_t
 {
-    command_t command;
+    command_t command = {0};
     command.translate_virt.virt_src = virt_addr;
 
     const auto result = hypercall(VMEXIT_KEY, vmexit_command_t::translate, &command);
@@ -60,14 +96,14 @@ auto voyager::translate(guest_virt_t virt_addr) -> guest_phys_t
 
 auto voyager::read_phys(guest_phys_t phys_addr, guest_virt_t buffer, u64 size) -> vmxroot_error_t
 {
-    command_t command;
+    command_t command = {0};
     command.copy_phys = { phys_addr, buffer, size };
     return hypercall(VMEXIT_KEY, vmexit_command_t::read_guest_phys, &command);
 }
 
 auto voyager::write_phys(guest_phys_t phys_addr, guest_virt_t buffer, u64 size) -> vmxroot_error_t
 {
-    command_t command;
+    command_t command = {0};
     command.copy_phys = { phys_addr, buffer, size };
     return hypercall(VMEXIT_KEY, vmexit_command_t::write_guest_phys, &command);
 }
@@ -75,7 +111,7 @@ auto voyager::write_phys(guest_phys_t phys_addr, guest_virt_t buffer, u64 size) 
 auto voyager::copy_virt(guest_phys_t dirbase_src, guest_virt_t virt_src, guest_phys_t dirbase_dest,
     guest_virt_t virt_dest, u64 size) -> vmxroot_error_t
 {
-    command_t command;
+    command_t command = {0};
     command.copy_virt = { dirbase_src, virt_src, dirbase_dest, virt_dest, size };
     return hypercall(VMEXIT_KEY, vmexit_command_t::copy_guest_virt, &command);
 }

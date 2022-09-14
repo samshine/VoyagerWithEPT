@@ -144,7 +144,7 @@ auto mm::translate_guest_physical(guest_phys_t phys_addr, map_type_t map_type) -
 	const auto epdpt_large =
 		reinterpret_cast<ept_pdpte_1gb*>(map_page(
 			epml4[guest_phys.pml4_index].page_frame_number << 12, map_type));
-
+	
 	// handle 1gb page...
 	if (epdpt_large[guest_phys.pdpt_index].large_page)
 		return (epdpt_large[guest_phys.pdpt_index].page_frame_number
@@ -184,7 +184,13 @@ auto mm::init() -> vmxroot_error_t
 	const auto pt_phys = 
 		translate(reinterpret_cast<u64>(pt));
 
-	if (!pdpt_phys || !pd_phys || !pt_phys)
+	const auto shadHookData_phys =
+		translate(reinterpret_cast<u64>(&ShadowHookData));
+
+	const auto shadow_phys = 
+		translate(reinterpret_cast<u64>(&shadow));
+
+	if (!pdpt_phys || !pd_phys || !pt_phys || !shadHookData_phys || !shadow_phys)
 		return vmxroot_error_t::invalid_host_virtual;
 
 	// setup mapping page table entries...

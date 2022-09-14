@@ -664,16 +664,33 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="debug.cpp" />
+    <ClCompile Include="ept.cpp" />
     <ClCompile Include="mm.cpp" />
     <ClCompile Include="vmexit.cpp" />
     <ClCompile Include="vmexit_handler.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="asm.h" />
     <ClInclude Include="debug.h" />
+    <ClInclude Include="ept.h" />
     <ClInclude Include="ia32.hpp" />
     <ClInclude Include="mm.h" />
     <ClInclude Include="types.h" />
     <ClInclude Include="vmexit.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="x64.asm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='1903|x64'">false</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='1903|x64'">true</DeploymentContent>
+      <Command Condition="'$(Configuration)|$(Platform)'=='1903|x64'">ml64 /Fo $(IntDir)%(fileName).obj /c %(fileName).asm</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='1903|x64'">$(IntDir)%(fileName).obj;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='1909|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='1909|x64'">true</DeploymentContent>
+      <Command Condition="'$(Configuration)|$(Platform)'=='1909|x64'">ml64 /Fo $(IntDir)%(fileName).obj /c %(fileName).asm</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='1909|x64'">$(IntDir)%(fileName).obj;%(Outputs)</Outputs>
+      <DeploymentContent>true</DeploymentContent>
+    </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
