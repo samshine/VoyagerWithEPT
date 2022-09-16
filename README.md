@@ -1,12 +1,14 @@
 <div align="center">
     <div>
         <img src="https://githacks.org/xerox/voyager/-/raw/bc07837aae126ed06130f7524e3f8464d2b3ca13/img/unknown.png"/>
+    <div>
+        <img src="https://git.back.engineering/_xeroxz/Voyager/raw/branch/master/img/unknown.png"/>
     </div>
-    <img src="https://githacks.org/xerox/voyager/-/raw/master/img/amd_badge.svg"/>
-    <img src="https://githacks.org/xerox/voyager/-/raw/master/img/Intel-supported-green.svg"/>
-    <img src="https://githacks.org/xerox/voyager/-/raw/master/img/2004--1507-supported-green.svg"/>
-    <img src="https://githacks.org/xerox/voyager/-/raw/10f786da01b35d23de7abfcfecd6e54ed1efca0f/img/Secure%20Boot-Unsupported-red.svg"/>
-    <img src="https://githacks.org/xerox/voyager/-/raw/master/img/Legacy_BIOS-Unsupported-red.svg"/>
+    <img src="https://git.back.engineering/_xeroxz/Voyager/raw/branch/master/img/amd_badge.svg"/>
+    <img src="https://git.back.engineering/_xeroxz/Voyager/raw/branch/master/img/Intel-supported-green.svg"/>
+    <img src="https://git.back.engineering/_xeroxz/Voyager/raw/branch/master/img/2004--1507-supported-green.svg"/>
+    <img src="https://git.back.engineering/_xeroxz/Voyager/raw/branch/master/img/Secure%20Boot-Unsupported-red.svg"/>
+    <img src="https://git.back.engineering/_xeroxz/Voyager/raw/branch/master/img/Legacy_BIOS-Unsupported-red.svg"/>
 </div>
 
 ***
